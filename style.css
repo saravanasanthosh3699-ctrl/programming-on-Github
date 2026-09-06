@@ -1,0 +1,38 @@
+body{
+    background-color: white;
+    text-align : centre;
+   
+
+}
+
+.calculator{
+
+      background-color: rgb(138, 44, 122);
+      width:300px;
+      margin-left: 450px;
+      padding:20px;
+       border: 100px;
+        border : 8px double purple;
+}      
+input{
+    width:270;
+    height:50px;
+    font-size:25px;
+    text-align:left;
+    margin-botton:15px;
+    border: 3px dashed purple;
+    color:purple;
+    /* border = "4"; */
+
+}
+
+button{
+    width:60px;
+    height:50px;
+    margin:5px;
+    font-size:20px;
+    background-color: black;
+    color:rgb(18, 219, 18);
+    border : 2px dotted red;
+    /* border-color: red; */
+}
