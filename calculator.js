@@ -1,109 +1,118 @@
-// Get the display
-let display = document.getElementById("display");
+// Wait until HTML is completely loaded
+window.onload = function () {
+
+    // Get the display
+    window.display = document.getElementById("display");
+
+};
 
 
-// --------------------
-// Add number/operator
-// --------------------
-function addValue(value) {
-    display.value += value;
-}
-
-
-// --------------------
-// Clear everything - AC
-// --------------------
+// Clear all
 function clearDisplay() {
-    display.value = "";
+    document.getElementById("display").value = "";
 }
 
 
-// --------------------
-// Clear one character - C
-// --------------------
+// Clear one character
 function clearone() {
+
+    let display = document.getElementById("display");
+
     display.value = display.value.slice(0, -1);
 }
 
 
-// --------------------
-// Calculate answer - =
-// --------------------
+// Calculate
 function calculate() {
+
+    let display = document.getElementById("display");
 
     let expression = display.value;
 
     try {
 
         // Remove spaces
-        expression = expression.replace(/\s+/g, "");
+        expression = expression.replace(/\s/g, "");
 
-        // Automatically add * for cases like:
-        // 7(2)   -> 7*(2)
-        // 2(3+4) -> 2*(3+4)
-        // (2)7   -> (2)*7
-        // (2)(3) -> (2)*(3)
+        // --------------------------------
+        // Automatic multiplication
+        // --------------------------------
 
+        // 7(2) → 7*(2)
         expression = expression.replace(
-            /(\d|\))(?=\()/g,
-            "$1*"
+            /(\d|\))\(/g,
+            "$1*("
         );
 
+        // (2)7 → (2)*7
         expression = expression.replace(
-            /(\))(?=\d)/g,
-            "$1*"
+            /\)(\d)/g,
+            ")*$1"
         );
 
-        // Convert percentage
-        // 50% -> 50/100
+        // (2)(3) → (2)*(3)
         expression = expression.replace(
-            /(\d+(?:\.\d+)?)%/g,
-            "($1/100)"
+            /\)\(/g,
+            ")*("
         );
 
-        // Check for empty expression
-        if (expression === "") {
-            return;
-        }
 
+        // --------------------------------
         // Check brackets
+        // --------------------------------
+
         let open = 0;
 
-        for (let char of expression) {
+        for (let i = 0; i < expression.length; i++) {
 
-            if (char === "(") {
+            if (expression[i] === "(") {
                 open++;
             }
 
-            if (char === ")") {
+            if (expression[i] === ")") {
                 open--;
 
                 if (open < 0) {
-                    throw new Error("Wrong brackets");
+                    throw new Error();
                 }
             }
         }
 
         if (open !== 0) {
-            throw new Error("Wrong brackets");
+            throw new Error();
         }
 
-        // Calculate
-        let result = eval(expression);
 
-        // Check invalid result
-        if (!Number.isFinite(result)) {
-            throw new Error("Invalid calculation");
+        // --------------------------------
+        // Percentage
+        // --------------------------------
+
+        expression = expression.replace(
+            /(\d+(?:\.\d+)?)%/g,
+            "($1/100)"
+        );
+
+
+        // --------------------------------
+        // Calculate answer
+        // --------------------------------
+
+        let answer = eval(expression);
+
+
+        // Check invalid answer
+        if (!Number.isFinite(answer)) {
+            throw new Error();
         }
 
-        display.value = result;
 
-    } catch (error) {
+        display.value = answer;
+
+    }
+
+    catch {
 
         display.value = "Error";
 
     }
-}
-
-      
-       
+};
