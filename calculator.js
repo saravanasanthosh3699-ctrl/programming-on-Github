@@ -5,16 +5,31 @@
     document.getElementById("display").value = "";
 }
 
+function clearOne() {
+    let display = document.getElementById("display");
+    display.value = display.value.slice(0, -1);
+}
+
+function appendValue(value) {
+    document.getElementById("display").value += value;
+}
 
 function calculate() {
-    let expression = document.getElementById("display").value;
+    let display = document.getElementById("display");
+    let expression = display.value;
 
     try {
+        // 7(2) → 7*(2)
+        expression = expression.replace(/(\d|\))\(/g, "$1*(");
+
+        // (2)7 → (2)*7
+        expression = expression.replace(/\)(\d)/g, ")*$1");
+
         let result = eval(expression);
 
-        document.getElementById("display").value = result;
+        display.value = result;
     }
-    catch {
-        document.getElementById("display").value = "Error";
+    catch (error) {
+        display.value = "Error";
     }
 }
