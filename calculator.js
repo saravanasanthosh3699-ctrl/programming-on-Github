@@ -1,114 +1,116 @@
 
 
       
-       
-        
-      
-        let a = Number(prompt("Numbers count"));
-        let num = [];
-        let currentNumber = "";
-         function press(value) {
-            if (value >= '0' && value <= '9' || value === '.'){
-                currentNumber = currentNumber + value;
+       let numbers = [];
+let operators = [];
+let currentNumber = "";
 
-                document.getElementById("display").value = calculator;
+
+function press(value) {
+
+    // If the value is a number or decimal point
+    if ((value >= "0" && value <= "9") || value === ".") {
+
+        currentNumber += value;
+
+        document.getElementById("display").value = currentNumber;
+    }
+
+    // If the value is an operator
+    else {
+
+        if (currentNumber !== "") {
+
+            numbers.push(Number(currentNumber));
+            currentNumber = "";
+        }
+
+        operators.push(value);
+
+        document.getElementById("display").value += value;
+    }
+}
+
+
+function calculate() {
+
+    // Store the last number
+    if (currentNumber !== "") {
+
+        numbers.push(Number(currentNumber));
+    }
+
+    if (numbers.length === 0) {
+        return;
+    }
+
+
+    // First calculate *, / and %
+    for (let i = 0; i < operators.length; i++) {
+
+        if (operators[i] === "*" ||
+            operators[i] === "/" ||
+            operators[i] === "%") {
+
+            let result;
+
+            if (operators[i] === "*") {
+                result = numbers[i] * numbers[i + 1];
             }
-             else{
-                if (currentNumber !== ""){
-                    numbers.push(Numbers(currentNumber));
-                                  currentNumber = "";
-                }
-                 operators.push(value);
 
-                 document.getElementById("display").value += value;
-
-               
-             }
-         }
-
-         function calculate(){
-            if (currentNumber !== "" )
-            {
-                numbers.push(Number(currentNumber = ""));
+            else if (operators[i] === "/") {
+                result = numbers[i] / numbers[i + 1];
             }
-         }
+
+            else if (operators[i] === "%") {
+                result = numbers[i] % numbers[i + 1];
+            }
+
+            numbers[i] = result;
+
+            numbers.splice(i + 1, 1);
+            operators.splice(i, 1);
+
+            i--;
+        }
+    }
 
 
-       
-        
-        consol.log("Enter the numbers");
+    // Then calculate + and -
+    let result = numbers[0];
 
-        for(let i = 0; i <= a-1; i = i + 1)
-        {
-             num[i] = Number(prompt(i + 1));
-        }
+    for (let i = 0; i < operators.length; i++) {
 
-        for( let i = 0; i <= a-1; i = i + 1)
-        {
-             consol.log(num[i]);
-        }
-        
+        if (operators[i] === "+") {
 
-           
-       
-         let c = "";
-      
-         let k = 0;
-        
-
-     
-        
-
-        
-        for(let i = 0; i <= a-1; i = i + 1)
-        {
-        if( c === '+')
-        {
-             k = k + num[i];
-        }
-        else if( c === '-')
-        {
-             (k = k - num[i]);
-        }
-        }
-        if (c === '+' || c === '-')
-        {
-        consol.log(k);
+            result = result + numbers[i + 1];
         }
 
-        document.getElementById("display").value = k;
-             
-             numbers = [];
-             operators = [];
-             currentNumber = k.toString();
-        
-        function clearDisplay(){
-            numbers = [];
-            operators = [];
-            currentNumbers = "";
+        else if (operators[i] === "-") {
 
-            document.getElementById("display").value = "";
-        }     
-       
-    
-        let g = 1; 
-        for(let i = 0; i <= a-1; i = i + 1)
-        {
-        if( c === '*')
-        {
-              g = g * num[i];
-        } 
-        
-        else if( c == '/')
-        {
-            g =  num[i] / g;
+            result = result - numbers[i + 1];
         }
-        else if( c == '%')
-        {
-            g =  num[i] % g;
-        }
-        }
-        
+    }
+
+
+    document.getElementById("display").value = result;
+
+
+    // Store result for next calculation
+    numbers = [];
+    operators = [];
+    currentNumber = result.toString();
+}
+
+
+function clearDisplay() {
+
+    numbers = [];
+    operators = [];
+    currentNumber = "";
+
+    document.getElementById("display").value = "";
+}
         if (c == '*' || c == '/' || c == '%')
         {
         consol.log(g);
