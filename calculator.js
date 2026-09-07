@@ -29,7 +29,7 @@
          function calculate(){
             if (currentNumber !== "" )
             {
-                numbers.push(Number(currentNumber));
+                numbers.push(Number(currentNumber = ""));
             }
          }
 
@@ -45,13 +45,13 @@
 
         for( let i = 0; i <= a-1; i = i + 1)
         {
-             consol.log();
+             consol.log(num[i]);
         }
         
 
            
        
-         let c = prompt();
+         let c = "";
       
          let k = 0;
         
@@ -87,7 +87,7 @@
             operators = [];
             currentNumbers = "";
 
-            document.getElementById("display").value = ";"
+            document.getElementById("display").value = "";
         }     
        
     
@@ -125,7 +125,7 @@
             operators = [];
             currentNumbers = "";
 
-            document.getElementById("display").value = ";"
+            document.getElementById("display").value = "";
         }
         
        
