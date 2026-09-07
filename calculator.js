@@ -1,118 +1,56 @@
-// Wait until HTML is completely loaded
-window.onload = function () {
+const display = document.getElementById('display');
 
-    // Get the display
-    window.display = document.getElementById("display");
-
-};
-
-
-// Clear all
+// Clear everything
 function clearDisplay() {
-    document.getElementById("display").value = "";
+  display.value = '';
 }
 
-
-// Clear one character
+// Remove the last character (backspace)
 function clearone() {
-
-    let display = document.getElementById("display");
-
-    display.value = display.value.slice(0, -1);
+  display.value = display.value.slice(0, -1);
 }
 
-
-// Calculate
+// Evaluate the expression currently in the display
 function calculate() {
+  const expression = display.value.trim();
 
-    let display = document.getElementById("display");
+  if (!expression) return;
 
-    let expression = display.value;
-
-    try {
-
-        // Remove spaces
-        expression = expression.replace(/\s/g, "");
-
-        // --------------------------------
-        // Automatic multiplication
-        // --------------------------------
-
-        // 7(2) → 7*(2)
-        expression = expression.replace(
-            /(\d|\))\(/g,
-            "$1*("
-        );
-
-        // (2)7 → (2)*7
-        expression = expression.replace(
-            /\)(\d)/g,
-            ")*$1"
-        );
-
-        // (2)(3) → (2)*(3)
-        expression = expression.replace(
-            /\)\(/g,
-            ")*("
-        );
-
-
-        // --------------------------------
-        // Check brackets
-        // --------------------------------
-
-        let open = 0;
-
-        for (let i = 0; i < expression.length; i++) {
-
-            if (expression[i] === "(") {
-                open++;
-            }
-
-            if (expression[i] === ")") {
-                open--;
-
-                if (open < 0) {
-                    throw new Error();
-                }
-            }
-        }
-
-        if (open !== 0) {
-            throw new Error();
-        }
-
-
-        // --------------------------------
-        // Percentage
-        // --------------------------------
-
-        expression = expression.replace(
-            /(\d+(?:\.\d+)?)%/g,
-            "($1/100)"
-        );
-
-
-        // --------------------------------
-        // Calculate answer
-        // --------------------------------
-
-        let answer = eval(expression);
-
-
-        // Check invalid answer
-        if (!Number.isFinite(answer)) {
-            throw new Error();
-        }
-
-
-        display.value = answer;
-
+  try {
+    // Basic safety check: only allow digits, operators, parentheses, dot, %, spaces
+    if (/[^0-9+\-*/%().\s]/.test(expression)) {
+      display.value = 'Error';
+      return;
     }
 
-    catch {
+    // Auto-balance any unclosed parentheses so expressions like "(2+3"
+    // still evaluate instead of throwing
+    const open = (expression.match(/\(/g) || []).length;
+    const close = (expression.match(/\)/g) || []).length;
+    const balanced = expression + ')'.repeat(Math.max(0, open - close));
 
-        display.value = "Error";
+    // Using Function instead of eval keeps this out of the local scope,
+    // while still correctly respecting parentheses and operator precedence
+    // (so nested/inner operations resolve before outer ones, and vice versa).
+    const result = Function('"use strict"; return (' + balanced + ')')();
 
+    if (result === undefined || Number.isNaN(result) || !Number.isFinite(result)) {
+      display.value = 'Error';
+    } else {
+      // Round off floating point noise, e.g. 0.1 + 0.2
+      display.value = Math.round(result * 1e10) / 1e10;
     }
+  } catch (err) {
+    display.value = 'Error';
+  }
+}
+
+// Optional: let the keyboard work too (Enter to calculate, Backspace to delete)
+display.addEventListener('keydown', function (e) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    calculate();
+  }
+});
+
 };
