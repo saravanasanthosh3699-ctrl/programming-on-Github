@@ -25,20 +25,57 @@ function insertAtCursor(value) {
   display.setSelectionRange(newPos, newPos);
 }
 
+// Turn "70%" into "(70/100)" and "(5+2)%" into "((5+2)/100)".
+// Walks backward from each % to find the full operand it applies to —
+// either a parenthesized group or a plain number — and wraps it.
+function convertPercent(expr) {
+  let result = expr;
+  let guard = 0;
+
+  while (result.includes('%') && guard < 100) {
+    guard++;
+    const idx = result.indexOf('%');
+    let start = idx - 1;
+
+    if (result[start] === ')') {
+      // Walk left to find the matching opening parenthesis
+      let depth = 1;
+      start--;
+      while (start >= 0 && depth > 0) {
+        if (result[start] === ')') depth++;
+        if (result[start] === '(') depth--;
+        if (depth > 0) start--;
+      }
+    } else {
+      // Walk left across a plain number (digits and a decimal point)
+      while (start >= 0 && /[0-9.]/.test(result[start])) start--;
+      start++;
+    }
+
+    const operand = result.slice(start, idx);
+    result = result.slice(0, start) + '(' + operand + '/100)' + result.slice(idx + 1);
+  }
+
+  return result;
+}
+
 // Evaluate the expression, including nested parentheses, in the correct
-// mathematical order (parentheses first, then * / %, then + -).
+// mathematical order (parentheses first, then * /, then + -).
 function calculate() {
   try {
     let expression = display.value.trim();
 
     if (expression === '') return;
 
+    // % means "percent" here (70% -> 0.7), not JS's modulo operator
+    expression = convertPercent(expression);
+
     // Allow implicit multiplication like "2(3+4)" or "(2+3)(4+5)" or "(2+3)4"
     expression = expression.replace(/(\d|\))\s*\(/g, '$1*(');
     expression = expression.replace(/\)\s*(\d)/g, ')*$1');
 
-    // Only allow safe calculator characters
-    if (!/^[0-9+\-*/%.() ]+$/.test(expression)) {
+    // Only allow safe calculator characters (no % left at this point)
+    if (!/^[0-9+\-*/.() ]+$/.test(expression)) {
       throw new Error('Invalid characters');
     }
 
